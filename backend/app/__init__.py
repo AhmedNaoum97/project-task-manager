@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 
+
 db = SQLAlchemy()
 jwt = JWTManager()
 
@@ -17,6 +18,9 @@ def create_app():
     db.init_app(app)
     jwt.init_app(app)
     CORS(app)
+
+    # Import models so they are registered with SQLAlchemy
+    from app.models import User
 
     with app.app_context():
         db.create_all()
