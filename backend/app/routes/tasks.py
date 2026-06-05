@@ -21,7 +21,7 @@ def create_task():
 
         # Create task
         task = Task(
-            user_id =user_id,
+            user_id=user_id,
             title =data["title"],
             description =data.get("description"),
             priority=data.get("priority", "medium"),
@@ -143,7 +143,7 @@ def delete_task(task_id):
 
         return jsonify({
             "success": True,
-            "message": "Task delete",
+            "message": "Task deleted successfully",
         }), 200
     except Exception as e:
         db.session.rollback()
