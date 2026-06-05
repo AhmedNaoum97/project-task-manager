@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
+import { TasksPage } from './pages/TasksPage';
 
 
 
@@ -14,7 +15,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/" element={token ? <Navigate to="/tasks" /> : <Navigate to="/login" />} />
-        <Route path="/tasks" element={token ? <div>Tasks Page (Coming Soon)</div> : <Navigate to="/login" />} />
+        <Route path="/tasks" element={token ? <TasksPage /> : <Navigate to="/login" />} />
       </Routes>
       </BrowserRouter>
     );

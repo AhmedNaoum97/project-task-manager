@@ -1,4 +1,5 @@
 import axios from 'axios';
+import type { CreateTaskPayload, UpdateTaskPayload } from '../types/task';
 
 const API_URL = 'http://localhost:5000/api/v1';
 
@@ -23,10 +24,16 @@ export const authService = {
         api.post('/auth/login', { email, password }),
         
 }
+
 export const taskService = {
-    getTasks: () => api.get('/tasks'),
-    createTask: (title: string, description?: string, priority?: string) =>
-        api.post('/tasks', { title, description, priority }),
-    updateTask: (id: string, data: any) => api.put(`/tasks/${id}`, data),
-    deleteTask: (id: string) => api.delete(`/tasks/${id}`)
+    getTasks: (status?: string, priority?: string) => 
+        api.get('/tasks', { params: { status, priority } }),
+    getTask: (id: string) =>
+        api.get(`/tasks/${id}`), 
+    createTask: (data: CreateTaskPayload) =>
+        api.post('/tasks', data),
+    updateTask: (id: string, data: UpdateTaskPayload) =>
+        api.put(`/tasks/${id}`, data),
+    deleteTask: (id: string) =>
+        api.delete(`/tasks/${id}`)
 };
