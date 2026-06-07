@@ -4,7 +4,7 @@ A full-stack task management application with JWT authentication, React frontend
 
 ## Live Demo
 
-## _Coming soon — deploying to Railway_
+_Coming soon — deploying to Railway_
 
 ## Quick Start
 
@@ -88,14 +88,19 @@ ProjectTaskManager/
 │   │   ├── models/        # User, Task
 │   │   └── routes/        # auth, tasks
 │   ├── tests/
+│   ├── Dockerfile
 │   └── requirements.txt
-└── frontend/
-    └── src/
-        ├── components/    # TaskCard, TaskForm
-        ├── pages/         # LoginPage, SignupPage, TasksPage
-        ├── context/       # AuthContext
-        ├── services/      # api.ts
-        └── types/         # task.ts
+├── frontend/
+│   ├── src/
+│   │   ├── components/    # TaskCard, TaskForm
+│   │   ├── pages/         # LoginPage, SignupPage, TasksPage
+│   │   ├── context/       # AuthContext
+│   │   ├── services/      # api.ts
+│   │   └── types/         # task.ts
+│   ├── Dockerfile
+│   └── nginx.conf
+├── docker-compose.yml
+└── README.md
 ```
 
 ---
