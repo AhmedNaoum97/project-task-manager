@@ -1,12 +1,10 @@
 # Task Manager
 
-A full-stack task management application with JWT authentication, React frontend, and AI-powered ADHD Mode.
+A full-stack task management application with JWT authentication, React frontend, and AI-powered ADHD/Dopamine Mode.
 
 ## Live Demo
 
-_Coming soon — deploying to Heroku_
-
----
+## _Coming soon — deploying to Railway_
 
 ## Quick Start
 
@@ -77,7 +75,7 @@ pytest tests/ -v
 | Backend    | Flask, SQLAlchemy, SQLite             |
 | Auth       | JWT, bcrypt                           |
 | Testing    | pytest                                |
-| Deployment | Docker, Heroku _(pending)_            |
+| Deployment | Docker, Railway, Vercel _(pending)_   |
 
 ---
 
@@ -132,5 +130,14 @@ ProjectTaskManager/
 ## Next Steps
 
 - [ ] ADHD/Dopamine Mode (Claude API integration)
-- [ ] Docker containerization
-- [ ] Heroku deployment
+- [ ] Railway + Vercel deployment
+
+## Docker
+
+Run the full stack with one command:
+
+```bash
+docker-compose up
+```
+
+App available at `http://localhost`

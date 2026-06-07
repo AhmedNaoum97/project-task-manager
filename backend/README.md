@@ -27,7 +27,7 @@ DATABASE_URL=sqlite:///taskmanager.db
 JWT_SECRET=your-secret-key-here
 FLASK_ENV=development
 CLAUDE_API_KEY=sk-your-key-here
-```
+``` 
 
 ### Run
 

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { CreateTaskPayload, UpdateTaskPayload } from '../types/task';
 
-const API_URL = 'http://localhost:5000/api/v1';
+const API_URL = import.meta.env.VITE_API_URL || '/api/v1';
 
 const api = axios.create({
     baseURL: API_URL
