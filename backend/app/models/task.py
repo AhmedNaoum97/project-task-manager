@@ -11,7 +11,7 @@ class Task(db.Model):
     priority = db.Column(db.String(20), default="medium")
     status = db.Column(db.String(20), default="pending")
     due_date = db.Column(db.DateTime, nullable=True)
-    completed_at = db.Column(db.DateTime, default=datetime.utcnow)
+    completed_at = db.Column(db.DateTime, nullable=True, default=None)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
