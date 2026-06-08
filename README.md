@@ -1,10 +1,11 @@
 # Task Manager
 
-A full-stack task management application with JWT authentication, React frontend, and AI-powered ADHD/Dopamine Mode.
+A full-stack task management application with JWT authentication, React frontend, and Docker deployment.
 
 ## Live Demo
 
-_Coming soon — deploying to Railway_
+- **Frontend:** https://project-task-manager-navy.vercel.app
+- **Backend:** https://project-task-manager-production-a431.up.railway.app
 
 ## Quick Start
 
@@ -29,7 +30,6 @@ Create `backend/.env`:
 DATABASE_URL=sqlite:///taskmanager.db
 JWT_SECRET=your-secret-key-here
 FLASK_ENV=development
-CLAUDE_API_KEY=sk-your-key-here
 ```
 
 ```bash
@@ -63,7 +63,8 @@ pytest tests/ -v
 - Full task CRUD (create, read, update, delete)
 - Filter tasks by status and priority
 - Status cycling (Pending → In Progress → Completed)
-- ADHD Mode — AI-powered task analysis via Claude API _(coming soon)_
+- Responsive dark UI with Tailwind CSS
+- Dockerised for local full-stack development
 
 ---
 
@@ -75,7 +76,7 @@ pytest tests/ -v
 | Backend    | Flask, SQLAlchemy, SQLite             |
 | Auth       | JWT, bcrypt                           |
 | Testing    | pytest                                |
-| Deployment | Docker, Railway, Vercel _(pending)_   |
+| Deployment | Docker, Railway, Vercel |
 
 ---
 
@@ -108,34 +109,24 @@ ProjectTaskManager/
 ## API Endpoints
 
 ### Auth
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | /api/v1/auth/signup | Register new user |
+| POST | /api/v1/auth/login | Login and get JWT token |
 
-| Method | Endpoint              | Description             |
-| ------ | --------------------- | ----------------------- |
-| POST   | `/api/v1/auth/signup` | Register new user       |
-| POST   | `/api/v1/auth/login`  | Login and get JWT token |
-
-### Tasks _(JWT required)_
-
-| Method | Endpoint             | Description     |
-| ------ | -------------------- | --------------- |
-| GET    | `/api/v1/tasks`      | Get all tasks   |
-| POST   | `/api/v1/tasks`      | Create task     |
-| GET    | `/api/v1/tasks/{id}` | Get single task |
-| PUT    | `/api/v1/tasks/{id}` | Update task     |
-| DELETE | `/api/v1/tasks/{id}` | Delete task     |
+### Tasks (JWT required)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /api/v1/tasks | Get all tasks |
+| POST | /api/v1/tasks | Create task |
+| GET | /api/v1/tasks/{id} | Get single task |
+| PUT | /api/v1/tasks/{id} | Update task |
+| DELETE | /api/v1/tasks/{id} | Delete task |
 
 ### Health
-
-| Method | Endpoint         | Description      |
-| ------ | ---------------- | ---------------- |
-| GET    | `/api/v1/health` | API health check |
-
----
-
-## Next Steps
-
-- [ ] ADHD/Dopamine Mode (Claude API integration)
-- [ ] Railway + Vercel deployment
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /api/v1/health | API health check |
 
 ## Docker
 
@@ -146,3 +137,9 @@ docker-compose up
 ```
 
 App available at `http://localhost`
+
+
+---
+
+## Roadmap
+- ADHD/Dopamine Mode — AI-powered task prioritisation via Claude API
