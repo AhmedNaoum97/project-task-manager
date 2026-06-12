@@ -52,7 +52,7 @@ App available at `http://localhost:5173`
 
 ```bash
 cd backend
-pytest tests/ -v
+python -m pytest tests/ -v
 ```
 
 ---
@@ -68,15 +68,25 @@ pytest tests/ -v
 
 ---
 
+## Security
+
+- Passwords hashed with bcrypt; JWTs signed with a 256-bit secret stored in environment variables
+- All task queries scoped to the authenticated user — cross-user access returns 404 (no resource disclosure)
+- Generic error responses; full tracebacks logged server-side only
+- Production served via gunicorn (debug mode gated behind FLASK_ENV)
+- Identical error messages on login to prevent username enumeration
+
+---
+
 ## Tech Stack
 
 | Layer      | Technology                            |
 | ---------- | ------------------------------------- |
 | Frontend   | React, TypeScript, Vite, Tailwind CSS |
-| Backend    | Flask, SQLAlchemy, SQLite             |
+| Backend    | Flask, SQLAlchemy, SQLite, gunicorn   |
 | Auth       | JWT, bcrypt                           |
 | Testing    | pytest                                |
-| Deployment | Docker, Railway, Vercel |
+| Deployment | Docker, Railway, Vercel               |
 
 ---
 
@@ -109,24 +119,27 @@ ProjectTaskManager/
 ## API Endpoints
 
 ### Auth
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | /api/v1/auth/signup | Register new user |
-| POST | /api/v1/auth/login | Login and get JWT token |
+
+| Method | Endpoint            | Description             |
+| ------ | ------------------- | ----------------------- |
+| POST   | /api/v1/auth/signup | Register new user       |
+| POST   | /api/v1/auth/login  | Login and get JWT token |
 
 ### Tasks (JWT required)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | /api/v1/tasks | Get all tasks |
-| POST | /api/v1/tasks | Create task |
-| GET | /api/v1/tasks/{id} | Get single task |
-| PUT | /api/v1/tasks/{id} | Update task |
-| DELETE | /api/v1/tasks/{id} | Delete task |
+
+| Method | Endpoint           | Description     |
+| ------ | ------------------ | --------------- |
+| GET    | /api/v1/tasks      | Get all tasks   |
+| POST   | /api/v1/tasks      | Create task     |
+| GET    | /api/v1/tasks/{id} | Get single task |
+| PUT    | /api/v1/tasks/{id} | Update task     |
+| DELETE | /api/v1/tasks/{id} | Delete task     |
 
 ### Health
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | /api/v1/health | API health check |
+
+| Method | Endpoint       | Description      |
+| ------ | -------------- | ---------------- |
+| GET    | /api/v1/health | API health check |
 
 ## Docker
 
@@ -138,8 +151,8 @@ docker-compose up
 
 App available at `http://localhost`
 
-
 ---
 
 ## Roadmap
+
 - ADHD/Dopamine Mode — AI-powered task prioritisation via Claude API
