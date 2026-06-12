@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from .. import db
 from ..models import Task
@@ -22,8 +22,8 @@ def create_task():
         # Create task
         task = Task(
             user_id=user_id,
-            title =data["title"],
-            description =data.get("description"),
+            title=data["title"],
+            description=data.get("description"),
             priority=data.get("priority", "medium"),
             due_date=datetime.fromisoformat(data["due_date"]) if data.get("due_date") else None
         )
@@ -36,9 +36,11 @@ def create_task():
             "data": task.to_dict()
         }), 201
 
-    except Exception as e:
+    except Exception:
         db.session.rollback()
-        return jsonify({"error": str(e)}), 500
+        current_app.logger.exception("Unhandled error in create_task")
+        return jsonify({"error": "Internal server error"}), 500
+
 
 @tasks_bp.route("", methods=["GET"])
 @jwt_required()
@@ -65,12 +67,14 @@ def get_tasks():
             "data": [task.to_dict() for task in tasks]
         }), 200
 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        current_app.logger.exception("Unhandled error in get_tasks")
+        return jsonify({"error": "Internal server error"}), 500
+
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 @jwt_required()
-def get_task( task_id):
+def get_task(task_id):
     """Get single task"""
     try:
         user_id = get_jwt_identity()
@@ -84,8 +88,10 @@ def get_task( task_id):
             "data": task.to_dict()
         }), 200
 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        current_app.logger.exception("Unhandled error in get_task")
+        return jsonify({"error": "Internal server error"}), 500
+
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 @jwt_required()
@@ -122,9 +128,10 @@ def update_task(task_id):
             "data": task.to_dict()
         }), 200
 
-    except Exception as e:
+    except Exception:
         db.session.rollback()
-        return jsonify({"error": str(e)}), 500
+        current_app.logger.exception("Unhandled error in update_task")
+        return jsonify({"error": "Internal server error"}), 500
 
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
@@ -145,6 +152,8 @@ def delete_task(task_id):
             "success": True,
             "message": "Task deleted successfully",
         }), 200
-    except Exception as e:
+
+    except Exception:
         db.session.rollback()
-        return jsonify({"error": str(e)}), 500
+        current_app.logger.exception("Unhandled error in delete_task")
+        return jsonify({"error": "Internal server error"}), 500

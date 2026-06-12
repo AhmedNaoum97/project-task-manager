@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from .. import db, jwt
 from ..models import User
 from flask_jwt_extended import create_access_token
@@ -39,9 +39,10 @@ def signup():
             }
         }), 201
 
-    except Exception as e:
+    except Exception:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        current_app.logger.exception("Unhandled error in signup")
+        return jsonify({'error': 'Internal server error'}), 500
 
 
 @auth_bp.route('/login', methods=['POST'])
@@ -71,5 +72,6 @@ def login():
             }
         }), 200
 
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    except Exception:
+        current_app.logger.exception("Unhandled error in login")
+        return jsonify({'error': 'Internal server error'}), 500
