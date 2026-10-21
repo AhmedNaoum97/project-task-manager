@@ -3,6 +3,9 @@ from .. import db, jwt
 from ..models import User
 from flask_jwt_extended import create_access_token
 from datetime import timedelta
+from pydantic import ValidationError
+from ..schemas import AuthSchema, LoginSchema
+
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/v1/auth')
 
@@ -11,19 +14,23 @@ auth_bp = Blueprint('auth', __name__, url_prefix='/api/v1/auth')
 def signup():
     """Register a new user"""
     try:
-        data = request.get_json()
+        data = request.get_json(silent=True)
 
         # Validate input
-        if not data or not data.get('email') or not data.get('password'):
-            return jsonify({'error': 'Email and password required'}), 400
+        try:
+            payload = AuthSchema.model_validate(data)
+        except ValidationError as e:
+            return jsonify({'error': 'Invalid input',
+                         'details': e.errors(include_url=False, include_input=False, include_context=False)}), 400
+        
 
         # Check if user exists
-        if User.query.filter_by(email=data['email']).first():
+        if User.query.filter_by(email=payload.email).first():
             return jsonify({'error': 'Email already registered'}), 409
 
         # Create new user
-        user = User(email=data['email'])
-        user.set_password(data['password'])
+        user = User(email=payload.email)
+        user.set_password(payload.password)
 
         db.session.add(user)
         db.session.commit()
@@ -49,16 +56,19 @@ def signup():
 def login():
     """Login user and return JWT token"""
     try:
-        data = request.get_json()
+        data = request.get_json(silent=True)
 
         # Validate input
-        if not data or not data.get('email') or not data.get('password'):
-            return jsonify({'error': 'Email and password required'}), 400
+        try:
+            payload = LoginSchema.model_validate(data)
+        except ValidationError as e:
+            return jsonify({'error': 'Invalid input',
+                         'details': e.errors(include_url=False, include_input=False, include_context=False)}), 400
 
         # Find user
-        user = User.query.filter_by(email=data['email']).first()
+        user = User.query.filter_by(email=payload.email).first()
 
-        if not user or not user.check_password(data['password']):
+        if not user or not user.check_password(payload.password):
             return jsonify({'error': 'Invalid email or password'}), 401
 
         # Generate JWT token

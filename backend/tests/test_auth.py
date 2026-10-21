@@ -3,6 +3,7 @@ import json
 from app import create_app, db
 from app.models import User
 
+TEST_PASSWORD = "correct-horse-battery"
 
 @pytest.fixture
 def client():
@@ -26,12 +27,12 @@ def auth_token(client):
     """Get JWT token for testing protected routes"""
     client.post("/api/v1/auth/signup", json={
         "email": "test@test.com",
-        "password": "password123"
+        "password": TEST_PASSWORD
     })
 
     response = client.post("/api/v1/auth/login", json={
         "email": "test@test.com",
-        "password": "password123"
+        "password": TEST_PASSWORD
     })
 
     data = json.loads(response.data)
@@ -42,7 +43,7 @@ def test_signup(client):
     """Test user signup"""
     response = client.post("/api/v1/auth/signup", json={
         "email": "test@test.com",
-        "password": "password123"
+        "password": TEST_PASSWORD
     })
 
     assert response.status_code == 201
@@ -55,12 +56,12 @@ def test_login(client):
     """Test user login"""
     client.post("/api/v1/auth/signup", json={
         "email": "test@test.com",
-        "password": "password123"
+        "password": TEST_PASSWORD
     })
 
     response = client.post("/api/v1/auth/login", json={
         "email": "test@test.com",
-        "password": "password123"
+        "password": TEST_PASSWORD
     })
 
     assert response.status_code == 200
