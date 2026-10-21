@@ -122,3 +122,32 @@ def test_health_check(client):
     response = client.get("/api/v1/health")
     data = json.loads(response.data)
     assert data["status"] == "ok"
+
+def test_signup_weak_password(client):
+    """Test that signup fails with a weak password"""
+    response = client.post("/api/v1/auth/signup", json={
+        "email": "test@test.com",
+        "password": "weak"
+    })
+    assert response.status_code == 400
+
+def test_signup_invalid_email(client):
+    """Test that signup fails with an invalid e-mail"""
+    response = client.post("/api/v1/auth/signup", json={
+        "email": "invalid-email",
+        "password": TEST_PASSWORD
+    })
+    assert response.status_code == 400
+
+
+def test_create_task_invalid_date(client, auth_token):
+    """Test that creating a task fails with an invalid date format"""
+    response = client.post(
+        "/api/v1/tasks",
+        json={
+            "title": "Test Task",
+            "due_date": "nope"
+        },
+        headers={"Authorization": f"Bearer {auth_token}"}
+    )
+    assert response.status_code == 400
