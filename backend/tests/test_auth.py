@@ -9,8 +9,7 @@ def client():
     """Create app for testing"""
     import os
     os.environ["DATABASE_URL"] = "sqlite:///:memory:"
-    os.environ["JWT_SECRET"] = "test-secret-key"
-
+    os.environ["JWT_SECRET"] = "test-secret-key-that-is-at-least-32-bytes"
     app = create_app()
     app.config["TESTING"] = True
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
