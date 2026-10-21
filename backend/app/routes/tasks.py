@@ -3,6 +3,9 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from .. import db
 from ..models import Task
 from datetime import datetime
+from pydantic import ValidationError
+from ..schemas import TaskCreate, TaskUpdate
+
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/api/v1/tasks")
 
@@ -13,20 +16,16 @@ def create_task():
     # Create a new task
     try:
         user_id = get_jwt_identity()
-        data = request.get_json()
+        data = request.get_json(silent=True)
 
         # Validate input
-        if not data or not data.get("title"):
-            return jsonify({"error": "Title is required"}), 400
-
+        try:
+            payload = TaskCreate.model_validate(data)
+        except ValidationError as e:
+            return jsonify({"error": "Invalid input",
+                            "details": e.errors(include_url=False, include_input=False, include_context=False)}), 400
         # Create task
-        task = Task(
-            user_id=user_id,
-            title=data["title"],
-            description=data.get("description"),
-            priority=data.get("priority", "medium"),
-            due_date=datetime.fromisoformat(data["due_date"]) if data.get("due_date") else None
-        )
+        task = Task(user_id=user_id, **payload.model_dump())
 
         db.session.add(task)
         db.session.commit()
@@ -104,22 +103,26 @@ def update_task(task_id):
         if not task:
             return jsonify({"error": "Task not found"}), 404
 
-        data = request.get_json()
+        data = request.get_json(silent=True)
+
+        if not data:
+            return jsonify({"error": "Invalid input"}), 400
+
+        try:
+            payload = TaskUpdate.model_validate(data)
+        except ValidationError as e:
+            return jsonify({"error": "Invalid input", "details": e.errors(include_url=False, include_input=False, include_context=False)}), 400
 
         # Update fields
-        if "title" in data:
-            task.title = data["title"]
-        if "description" in data:
-            task.description = data["description"]
-        if "priority" in data:
-            task.priority = data["priority"]
-        if "status" in data:
-            task.status = data["status"]
-            if data["status"] == "completed" and not task.completed_at:
-                task.completed_at = datetime.utcnow()
-        if "due_date" in data:
-            task.due_date = datetime.fromisoformat(data["due_date"]) if data["due_date"] else None
+        # Update fields
+        updates = payload.model_dump(exclude_unset=True)
 
+        for field, value in updates.items():
+            setattr(task, field, value)
+
+        if updates.get("status") == "completed" and not task.completed_at:
+            task.completed_at = datetime.utcnow()
+            
         task.updated_at = datetime.utcnow()
         db.session.commit()
 
