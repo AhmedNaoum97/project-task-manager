@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
@@ -14,9 +16,18 @@ def create_app():
     from .config import Config
     app.config.from_object(Config)
 
+    # Fail fast: refuse to start without a strong JWT secret
+    secret = os.getenv("JWT_SECRET")
+    if not secret or len(secret) < 32:
+        raise RuntimeError("JWT_SECRET must be set and at least 32 characters")
+    app.config["JWT_SECRET_KEY"] = secret
+
     db.init_app(app)
     jwt.init_app(app)
-    CORS(app)
+
+    # CORS: only allow listed frontend origins
+    allowed_origins = os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
+    CORS(app, resources={r"/api/*": {"origins": allowed_origins}})
 
     # Import models AFTER db is initialized
     from .models import User

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
+from pydantic import BaseModel, EmailStr, Field, ConfigDict, field_validator
 from typing import Literal
 from datetime import datetime
 
@@ -6,6 +6,13 @@ class AuthSchema(BaseModel):
     model_config = ConfigDict(extra="forbid")
     email: EmailStr = Field(..., description="User's email address")
     password: str = Field(..., min_length=12, max_length=128, description="User's password")
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def normalize_email(cls, v):
+        if isinstance(v, str):
+            return v.strip().lower()
+        return v
 
 class TaskCreate(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -26,3 +33,10 @@ class LoginSchema(BaseModel):
     model_config = ConfigDict(extra="forbid")
     email: EmailStr = Field(..., description="User's email address")
     password: str = Field(..., min_length=1, max_length=128, description="User's password")
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def normalize_email(cls, v):
+        if isinstance(v, str):
+            return v.strip().lower()
+        return v

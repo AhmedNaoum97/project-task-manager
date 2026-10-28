@@ -197,3 +197,28 @@ def test_update_task_null_title(client, auth_token):
         headers={"Authorization": f"Bearer {auth_token}"},
     )
     assert response.status_code == 400
+
+def test_signup_email_case_insensitive(client):
+    """Same email with different case cannot register twice"""
+    client.post("/api/v1/auth/signup", json={
+        "email": "Test@Test.com",
+        "password": TEST_PASSWORD
+    })
+    response = client.post("/api/v1/auth/signup", json={
+        "email": "  test@test.com ",
+        "password": TEST_PASSWORD
+    })
+    assert response.status_code == 409
+
+
+def test_cors_blocks_unknown_origin(client):
+    """Unknown origins get no CORS allow header"""
+    response = client.get("/api/v1/health", headers={"Origin": "https://evil.com"})
+    assert "Access-Control-Allow-Origin" not in response.headers
+
+def test_app_refuses_weak_jwt_secret(monkeypatch):
+    """App must not start with a short JWT secret"""
+    monkeypatch.setenv("JWT_SECRET", "too-short")
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///:memory:")
+    with pytest.raises(RuntimeError):
+        create_app()
