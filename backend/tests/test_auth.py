@@ -5,6 +5,7 @@ from app.models import User
 
 TEST_PASSWORD = "correct-horse-battery"
 
+
 @pytest.fixture
 def client():
     """Create app for testing"""
@@ -123,6 +124,7 @@ def test_health_check(client):
     data = json.loads(response.data)
     assert data["status"] == "ok"
 
+
 def test_signup_weak_password(client):
     """Test that signup fails with a weak password"""
     response = client.post("/api/v1/auth/signup", json={
@@ -130,6 +132,7 @@ def test_signup_weak_password(client):
         "password": "weak"
     })
     assert response.status_code == 400
+
 
 def test_signup_invalid_email(client):
     """Test that signup fails with an invalid e-mail"""
@@ -147,6 +150,19 @@ def test_create_task_invalid_date(client, auth_token):
         json={
             "title": "Test Task",
             "due_date": "nope"
+        },
+        headers={"Authorization": f"Bearer {auth_token}"}
+    )
+    assert response.status_code == 400
+
+
+def test_create_task_invalid_priority(client, auth_token):
+    """Test that creating a task fails with an invalid priority"""
+    response = client.post(
+        "/api/v1/tasks",
+        json={
+            "title": "Test Task",
+            "priority": "invalid"
         },
         headers={"Authorization": f"Bearer {auth_token}"}
     )
