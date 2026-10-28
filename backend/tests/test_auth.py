@@ -215,3 +215,10 @@ def test_cors_blocks_unknown_origin(client):
     """Unknown origins get no CORS allow header"""
     response = client.get("/api/v1/health", headers={"Origin": "https://evil.com"})
     assert "Access-Control-Allow-Origin" not in response.headers
+
+def test_app_refuses_weak_jwt_secret(monkeypatch):
+    """App must not start with a short JWT secret"""
+    monkeypatch.setenv("JWT_SECRET", "too-short")
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///:memory:")
+    with pytest.raises(RuntimeError):
+        create_app()

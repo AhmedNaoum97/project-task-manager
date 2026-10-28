@@ -16,6 +16,12 @@ def create_app():
     from .config import Config
     app.config.from_object(Config)
 
+    # Fail fast: refuse to start without a strong JWT secret
+    secret = os.getenv("JWT_SECRET")
+    if not secret or len(secret) < 32:
+        raise RuntimeError("JWT_SECRET must be set and at least 32 characters")
+    app.config["JWT_SECRET_KEY"] = secret
+
     db.init_app(app)
     jwt.init_app(app)
 
