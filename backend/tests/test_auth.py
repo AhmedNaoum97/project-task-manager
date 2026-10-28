@@ -209,3 +209,9 @@ def test_signup_email_case_insensitive(client):
         "password": TEST_PASSWORD
     })
     assert response.status_code == 409
+
+
+def test_cors_blocks_unknown_origin(client):
+    """Unknown origins get no CORS allow header"""
+    response = client.get("/api/v1/health", headers={"Origin": "https://evil.com"})
+    assert "Access-Control-Allow-Origin" not in response.headers

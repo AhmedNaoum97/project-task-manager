@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
@@ -16,7 +18,10 @@ def create_app():
 
     db.init_app(app)
     jwt.init_app(app)
-    CORS(app)
+
+    # CORS: only allow listed frontend origins
+    allowed_origins = os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
+    CORS(app, resources={r"/api/*": {"origins": allowed_origins}})
 
     # Import models AFTER db is initialized
     from .models import User
