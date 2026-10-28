@@ -179,3 +179,21 @@ def test_create_task_extra_field(client, auth_token):
         headers={"Authorization": f"Bearer {auth_token}"}
     )
     assert response.status_code == 400
+
+def test_update_task_null_title(client, auth_token):
+    """Test that updating a task fails when title is null"""
+    # Create a task first
+    create_response = client.post(
+        "/api/v1/tasks",
+        json={"title": "Test Task"},
+        headers={"Authorization": f"Bearer {auth_token}"},
+    )
+    task_id = json.loads(create_response.data)["data"]["id"]
+
+    # Try to set title to null
+    response = client.put(
+        f"/api/v1/tasks/{task_id}",
+        json={"title": None},
+        headers={"Authorization": f"Bearer {auth_token}"},
+    )
+    assert response.status_code == 400
