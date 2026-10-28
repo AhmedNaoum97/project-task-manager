@@ -197,3 +197,15 @@ def test_update_task_null_title(client, auth_token):
         headers={"Authorization": f"Bearer {auth_token}"},
     )
     assert response.status_code == 400
+
+def test_signup_email_case_insensitive(client):
+    """Same email with different case cannot register twice"""
+    client.post("/api/v1/auth/signup", json={
+        "email": "Test@Test.com",
+        "password": TEST_PASSWORD
+    })
+    response = client.post("/api/v1/auth/signup", json={
+        "email": "  test@test.com ",
+        "password": TEST_PASSWORD
+    })
+    assert response.status_code == 409
