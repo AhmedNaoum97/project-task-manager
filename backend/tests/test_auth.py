@@ -167,3 +167,15 @@ def test_create_task_invalid_priority(client, auth_token):
         headers={"Authorization": f"Bearer {auth_token}"}
     )
     assert response.status_code == 400
+
+def test_create_task_extra_field(client, auth_token):
+    """Test that creating a task fails when an unknown field is sent"""
+    response = client.post(
+        "/api/v1/tasks",
+        json={
+            "title": "Test Task",
+            "user_id": "someone-else"
+        },
+        headers={"Authorization": f"Bearer {auth_token}"}
+    )
+    assert response.status_code == 400
