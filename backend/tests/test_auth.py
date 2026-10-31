@@ -236,3 +236,47 @@ def test_login_rate_limited(client):
         "password": "wrong-password"
     })
     assert response.status_code == 429
+
+def _signup_token(client, email):
+    """Helper: sign up a user and return their JWT"""
+    response = client.post("/api/v1/auth/signup", json={
+        "email": email,
+        "password": TEST_PASSWORD
+    })
+    return json.loads(response.data)["data"]["token"]
+
+
+def test_user_cannot_access_other_users_task(client):
+    """User B gets 404 on read/update/delete of user A's task"""
+    token_a = _signup_token(client, "alice@test.com")
+    token_b = _signup_token(client, "bob@test.com")
+
+    # Alice creates a task
+    create = client.post(
+        "/api/v1/tasks",
+        json={"title": "Alice's private task"},
+        headers={"Authorization": f"Bearer {token_a}"},
+    )
+    task_id = json.loads(create.data)["data"]["id"]
+    bob = {"Authorization": f"Bearer {token_b}"}
+
+    # Bob tries to read, update and delete it
+    assert client.get(f"/api/v1/tasks/{task_id}", headers=bob).status_code == 404
+    assert client.put(f"/api/v1/tasks/{task_id}", json={"title": "hacked"}, headers=bob).status_code == 404
+    assert client.delete(f"/api/v1/tasks/{task_id}", headers=bob).status_code == 404
+
+    # Alice's task is untouched
+    check = client.get(f"/api/v1/tasks/{task_id}", headers={"Authorization": f"Bearer {token_a}"})
+    assert json.loads(check.data)["data"]["title"] == "Alice's private task"
+
+
+def test_user_task_list_is_isolated(client):
+    """User B's task list does not include user A's tasks"""
+    token_a = _signup_token(client, "alice@test.com")
+    token_b = _signup_token(client, "bob@test.com")
+
+    client.post("/api/v1/tasks", json={"title": "Alice task"},
+                headers={"Authorization": f"Bearer {token_a}"})
+
+    response = client.get("/api/v1/tasks", headers={"Authorization": f"Bearer {token_b}"})
+    assert json.loads(response.data)["data"] == []
