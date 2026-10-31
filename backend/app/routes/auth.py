@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, current_app
-from .. import db, jwt
+from .. import db, jwt, limiter
 from ..models import User
 from flask_jwt_extended import create_access_token
 from datetime import timedelta
@@ -11,6 +11,7 @@ auth_bp = Blueprint('auth', __name__, url_prefix='/api/v1/auth')
 
 
 @auth_bp.route('/signup', methods=['POST'])
+@limiter.limit("3 per minute")
 def signup():
     """Register a new user"""
     try:
@@ -21,8 +22,7 @@ def signup():
             payload = AuthSchema.model_validate(data)
         except ValidationError as e:
             return jsonify({'error': 'Invalid input',
-                         'details': e.errors(include_url=False, include_input=False, include_context=False)}), 400
-        
+                            'details': e.errors(include_url=False, include_input=False, include_context=False)}), 400
 
         # Check if user exists
         if User.query.filter_by(email=payload.email).first():
@@ -53,6 +53,7 @@ def signup():
 
 
 @auth_bp.route('/login', methods=['POST'])
+@limiter.limit("5 per minute")
 def login():
     """Login user and return JWT token"""
     try:
@@ -63,7 +64,7 @@ def login():
             payload = LoginSchema.model_validate(data)
         except ValidationError as e:
             return jsonify({'error': 'Invalid input',
-                         'details': e.errors(include_url=False, include_input=False, include_context=False)}), 400
+                            'details': e.errors(include_url=False, include_input=False, include_context=False)}), 400
 
         # Find user
         user = User.query.filter_by(email=payload.email).first()
