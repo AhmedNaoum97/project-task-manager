@@ -4,7 +4,7 @@ A full-stack task management application with JWT authentication, a React fronte
 
 ## Live Demo
 
-- **Frontend:** https://project-task-manager-navy.vercel.app
+- **Frontend:** https://project-task-manager-navy.vercel.app (UI only — backend offline, signup/login won't work)
 - **Backend:** currently offline (hosting trial ended) — run locally with Docker, see below.
 
 ## Quick Start
@@ -73,7 +73,7 @@ python -m pytest tests/ -v
 
 ## Security
 
-Hardened after a self-conducted security review. Every control below is covered by an automated test.
+Hardened after a self-conducted security review. Controls are verified by automated tests where applicable.
 
 | Control             | Implementation                                  | Threat addressed                        |
 | ------------------- | ----------------------------------------------- | --------------------------------------- |
