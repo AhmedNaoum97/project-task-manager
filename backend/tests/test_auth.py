@@ -1,7 +1,7 @@
 import pytest
 import json
-from app import create_app, db
 from app.models import User
+from app import create_app, db, limiter
 
 TEST_PASSWORD = "correct-horse-battery"
 
@@ -13,6 +13,7 @@ def client():
     os.environ["DATABASE_URL"] = "sqlite:///:memory:"
     os.environ["JWT_SECRET"] = "test-secret-key-that-is-at-least-32-bytes"
     app = create_app()
+    limiter.reset()
     app.config["TESTING"] = True
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
 
@@ -222,3 +223,16 @@ def test_app_refuses_weak_jwt_secret(monkeypatch):
     monkeypatch.setenv("DATABASE_URL", "sqlite:///:memory:")
     with pytest.raises(RuntimeError):
         create_app()
+
+def test_login_rate_limited(client):
+    """6th login attempt in a minute is blocked"""
+    for _ in range(5):
+        client.post("/api/v1/auth/login", json={
+            "email": "test@test.com",
+            "password": "wrong-password"
+        })
+    response = client.post("/api/v1/auth/login", json={
+        "email": "test@test.com",
+        "password": "wrong-password"
+    })
+    assert response.status_code == 429
