@@ -13,7 +13,7 @@ A full-stack task management application with JWT authentication, a React fronte
 
 ### Prerequisites
 
-- Python 3.11+
+- Python 3.14+
 - Node.js 18+
 
 ### Backend Setup
