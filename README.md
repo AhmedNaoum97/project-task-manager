@@ -1,5 +1,7 @@
 # Task Manager
 
+![Tests](https://github.com/AhmedNaoum97/project-task-manager/actions/workflows/tests.yml/badge.svg)
+
 A full-stack task management application with JWT authentication, a React frontend, and Docker deployment — hardened after a self-conducted security review.
 
 ## Live Demo
